@@ -1,8 +1,12 @@
 # PthreadPool
-A Thread Pool  Realized by Pthread
+A Thread Pool  Realized by Pthread  
+博客：https://blog.csdn.net/Gryphoon/article/details/98397581
 
 ## 简述
 使用pthread实现的简单线程池，可以通过源码学习线程池的基本原理
+
+## 使用
+将文件 `PthreadPool.h` 和 `PthreadPool.cpp` 拷贝到需要使用的源码目录下，将头文件include在源码中，在编译时加上参数 `-lpthread` 即可
 
 ## 特性
 * 使用C++开发
