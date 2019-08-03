@@ -5,7 +5,6 @@ PthreadPool::PthreadPool()
     thread_num = 0;
     running_num = 0;
     shutdown = 0;
-    shutdown = false;
 }
 
 PthreadPool::~PthreadPool()
@@ -114,7 +113,6 @@ void *PthreadPool::threadpool_thread(void *threadpool)
         pthread_mutex_lock(&(pool->lock));
         while ((pool->thread_queue.empty()) && (!pool->shutdown))
         {
-            cout << "now:" << pthread_self() << endl;
             /* 任务队列为空，且线程池没有关闭时阻塞在这里 */
             pthread_cond_wait(&(pool->notify), &(pool->lock));
         }
@@ -150,49 +148,4 @@ void *PthreadPool::threadpool_thread(void *threadpool)
     pthread_mutex_unlock(&(pool->lock));
     pthread_exit(NULL);
     return (NULL);
-}
-
-//////////////////////////////////////////////
-
-int tasks = 0, done = 0;
-pthread_mutex_t lock;
-
-void dummy_task(void *arg)
-{
-    usleep(10000);
-    pthread_mutex_lock(&lock);
-    /* 记录成功完成的任务数 */
-    cout << "Tid:" << pthread_self() << "  " << done++ << endl;
-    pthread_mutex_unlock(&lock);
-}
-
-int main(int argc, char **argv)
-{
-    /* 初始化互斥锁 */
-    pthread_mutex_init(&lock, NULL);
-
-    /* 断言线程池创建成功 */
-    PthreadPool pool;
-    pool.Init(4);
-
-    /* 只要任务队列还没满，就一直添加 */
-    while (pool.AddTask(&dummy_task, NULL) == 0)
-    {
-        pthread_mutex_lock(&lock);
-        tasks++;
-        pthread_mutex_unlock(&lock);
-        // cout << tasks << endl;
-        if (tasks == 300)
-            break;
-    }
-
-    /* 不断检查任务数是否完成一半以上，没有则继续休眠 */
-    //    while((tasks / 2) > done) {
-    //        usleep(10000);
-    //    }
-    /* 这时候销毁线程池,0 代表 immediate_shutdown */
-    pool.Destory();
-    cout << "Did  tasks:" << done << endl;
-
-    return 0;
 }
